@@ -6,16 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lipaysamart/go-jwt-exerices/internal/controller"
 	"github.com/lipaysamart/go-jwt-exerices/pkg/config"
-	"github.com/lipaysamart/go-jwt-exerices/pkg/db"
+	"github.com/lipaysamart/gocommon/dbs"
 )
 
 type BootStrap struct {
 	engin    *gin.Engine
-	database db.IDatabase
+	database dbs.IDatabase
 	cfg      *config.Schema
 }
 
-func NewBootStrap(db db.IDatabase) *BootStrap {
+func NewBootStrap(db dbs.IDatabase) *BootStrap {
 	return &BootStrap{
 		engin:    gin.Default(),
 		database: db,

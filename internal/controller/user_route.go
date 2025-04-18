@@ -4,11 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lipaysamart/go-jwt-exerices/internal/repository"
 	"github.com/lipaysamart/go-jwt-exerices/internal/service"
-	"github.com/lipaysamart/go-jwt-exerices/pkg/db"
 	"github.com/lipaysamart/go-jwt-exerices/pkg/middleware"
+	"github.com/lipaysamart/gocommon/dbs"
 )
 
-func UserRoute(r *gin.RouterGroup, db db.IDatabase) {
+func UserRoute(r *gin.RouterGroup, db dbs.IDatabase) {
 	userRepo := repository.NewUserRepository(db)
 	userService := service.NewUserService(userRepo)
 	userHandle := NewUserHandle(userService)

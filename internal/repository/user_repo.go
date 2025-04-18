@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/lipaysamart/go-jwt-exerices/internal/model"
-	"github.com/lipaysamart/go-jwt-exerices/pkg/db"
+	"github.com/lipaysamart/gocommon/dbs"
 )
 
 type IUserRepo interface {
@@ -17,10 +17,10 @@ type IUserRepo interface {
 }
 
 type UserRepository struct {
-	database db.IDatabase
+	database dbs.IDatabase
 }
 
-func NewUserRepository(db db.IDatabase) *UserRepository {
+func NewUserRepository(db dbs.IDatabase) *UserRepository {
 	return &UserRepository{
 		database: db,
 	}
@@ -56,8 +56,8 @@ func (r *UserRepository) Find(ctx context.Context) ([]model.User, error) {
 func (r *UserRepository) FindUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	var user model.User
 
-	query := db.BuildQuery("email = ?", email)
-	if err := r.database.FindOne(ctx, &user, db.WithQuery(query)); err != nil {
+	query := dbs.BuildQuery("email = ?", email)
+	if err := r.database.FindOne(ctx, &user, dbs.WithQuery(query)); err != nil {
 		return nil, err
 	}
 
