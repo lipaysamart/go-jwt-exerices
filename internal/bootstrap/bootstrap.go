@@ -4,8 +4,10 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/lipaysamart/go-jwt-exerices/internal/controller"
 	"github.com/lipaysamart/go-jwt-exerices/pkg/config"
+	"github.com/lipaysamart/go-jwt-exerices/pkg/validation"
 	"github.com/lipaysamart/gocommon/dbs"
 )
 
@@ -41,8 +43,13 @@ func (b *BootStrap) Run() error {
 	return nil
 }
 
+func (b *BootStrap) InitValidation() validation.IValidation {
+	val := validator.New(validator.WithRequiredStructEnabled())
+	return validation.NewValidation(val)
+}
+
 func (b *BootStrap) MapRoutes() error {
 	v1 := b.engin.Group("/api/v1")
-	controller.UserRoute(v1, b.database)
+	controller.UserRoute(v1, b.database, b.InitValidation())
 	return nil
 }

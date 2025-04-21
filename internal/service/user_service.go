@@ -3,33 +3,41 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/lipaysamart/go-jwt-exerices/internal/model"
 	"github.com/lipaysamart/go-jwt-exerices/internal/repository"
 	"github.com/lipaysamart/go-jwt-exerices/pkg/jtoken"
 	"github.com/lipaysamart/go-jwt-exerices/pkg/utils"
+	"github.com/lipaysamart/go-jwt-exerices/pkg/validation"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type IUserService interface {
 	Register(ctx context.Context, req *model.UserRegisterReq) error
 	Login(ctx context.Context, req *model.UserLoginReq) (*model.User, string, string, error)
-	UpdateProfile(ctx context.Context, id string, req *model.UserRegisterReq) (*model.User, error)
 	GetUserByID(ctx context.Context, id string) (*model.User, error)
 	RefreshToken(ctx context.Context, userID string) (string, error)
 }
 
 type UserService struct {
 	userRepo repository.IUserRepo
+	validate validation.IValidation
 }
 
-func NewUserService(repo repository.IUserRepo) *UserService {
+func NewUserService(repo repository.IUserRepo, val validation.IValidation) *UserService {
 	return &UserService{
 		userRepo: repo,
+		validate: val,
 	}
 }
 
 func (s *UserService) Register(ctx context.Context, req *model.UserRegisterReq) error {
+	if err := s.validate.ValidateStruct(req); err != nil {
+		log.Println("failed to validate request body")
+		return err
+	}
+
 	var user model.User
 
 	utils.Copy(&user, req)
@@ -42,6 +50,10 @@ func (s *UserService) Register(ctx context.Context, req *model.UserRegisterReq) 
 }
 
 func (s *UserService) Login(ctx context.Context, req *model.UserLoginReq) (*model.User, string, string, error) {
+	if err := s.validate.ValidateStruct(req); err != nil {
+		log.Println("failed to validate request body")
+		return nil, "", "", err
+	}
 
 	user, err := s.userRepo.FindUserByEmail(ctx, req.Email)
 	if err != nil {
@@ -81,20 +93,4 @@ func (s *UserService) RefreshToken(ctx context.Context, userID string) (string, 
 	}
 	accessToken := jtoken.GenerateAccessToken(tokenData)
 	return accessToken, nil
-}
-
-func (s *UserService) UpdateProfile(ctx context.Context, id string, req *model.UserRegisterReq) (*model.User, error) {
-	user, err := s.userRepo.FindUserByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	utils.Copy(&user, req)
-
-	resp, err := s.userRepo.Update(ctx, user)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
 }

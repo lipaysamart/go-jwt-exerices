@@ -64,6 +64,7 @@ func (h *UserHandle) Register(ctx *gin.Context) {
 			"message": "Failed to register user...",
 			"error":   err.Error(),
 		})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -124,28 +125,4 @@ func (h *UserHandle) RefreshToken(ctx *gin.Context) {
 		"data":    resp,
 	})
 
-}
-func (h *UserHandle) UpdateProfile(ctx *gin.Context) {
-	var httpReq model.UserRegisterReq
-
-	id := ctx.Param("id")
-	if err := ctx.ShouldBind(&httpReq); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed parse request body...",
-			"error":   err.Error(),
-		})
-		return
-	}
-	user, err := h.userHandle.UpdateProfile(ctx, id, &httpReq)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Failed to update user...",
-			"error":   err.Error(),
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Update success...",
-		"data":    user,
-	})
 }

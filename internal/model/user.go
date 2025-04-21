@@ -19,14 +19,14 @@ type User struct {
 }
 
 type UserLoginReq struct {
-	Email    string `json:"email" `
-	Password string `json:"password" `
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password"  validate:"required,min=8"`
 }
 
 type UserRegisterReq struct {
-	Email    string `json:"email" `
+	Email    string `json:"email" validate:"required,email"`
 	Username string `json:"username" `
-	Password string `json:"password" `
+	Password string `json:"password"  validate:"required,min=8"`
 }
 
 type UserLoginResp struct {
